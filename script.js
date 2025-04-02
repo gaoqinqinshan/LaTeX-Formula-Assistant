@@ -11,7 +11,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // 监听API密钥保存按钮
     document.getElementById('saveApiKeyButton').addEventListener('click', saveApiKey);
 
-    // 初始化KaTeX渲染
+    // 监听复制LaTeX按钮
+    document.getElementById('copyLaTeXButton').addEventListener('click', copyLaTeX);
+
+    // 监听复制MathML按钮
+    document.getElementById('copyMathMLButton').addEventListener('click', copyMathML);
+
+    // 初始化Temml渲染
     renderLaTeX();
 
     // 尝试从本地存储加载API密钥
@@ -218,13 +224,62 @@ function renderLaTeX() {
     // 清空之前的渲染
     formulaDisplay.innerHTML = '';
 
-    // 使用KaTeX渲染
     try {
-        katex.render(latexInput, formulaDisplay, {
-            throwOnError: false,
-            displayMode: true
+        // 使用 temml.js 渲染 LaTeX
+        const html = temml.renderToString(latexInput, {
+            displayMode: true,
+            MathFont: 'Latin-Modern',
+            throwOnError: false
         });
+
+        // 将渲染结果插入到公式显示区域
+        formulaDisplay.innerHTML = html;
     } catch (error) {
         formulaDisplay.innerHTML = `<div class="text-danger">渲染错误: ${error.message}</div>`;
+    }
+}
+
+// 复制LaTeX
+function copyLaTeX() {
+    const latexInput = document.getElementById('latexInput').value;
+    if (latexInput) {
+        navigator.clipboard.writeText(latexInput).then(() => {
+            alert('LaTeX已复制到剪贴板');
+        }).catch(err => {
+            console.error('复制失败:', err);
+            alert('复制失败，请检查您的浏览器设置');
+        });
+    } else {
+        alert('没有LaTeX内容可复制');
+    }
+}
+
+// 复制MathML
+function copyMathML() {
+    const latexInput = document.getElementById('latexInput').value;
+    if (latexInput) {
+        try {
+            // 使用temml.js将LaTeX转换为MathML
+            const mathML = temml.renderToString(latexInput, {
+                displayMode: true,
+                annotate: true,
+                xml: true,
+                MathFont: 'Latin-Modern',
+                OutputType: 'Flat MML',
+
+            });
+
+            navigator.clipboard.writeText(mathML).then(() => {
+                alert('MathML已复制到剪贴板');
+            }).catch(err => {
+                console.error('复制失败:', err);
+                alert('复制失败，请检查您的浏览器设置');
+            });
+        } catch (error) {
+            console.error('转换失败:', error);
+            alert('无法转换为MathML，请检查LaTeX代码');
+        }
+    } else {
+        alert('没有LaTeX内容可转换');
     }
 }
