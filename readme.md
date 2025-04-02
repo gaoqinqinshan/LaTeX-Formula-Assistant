@@ -6,7 +6,7 @@ LaTex公式识别助手是一个基于多模态大模型的模型，可以识别
 
 ## 使用
 
-1. 下载release包，解压到本地。
+1. 下载release包，解压到本地。或者直接访问[GitHub Page](https://latex.luxiaoxiao.work/)
 2. 打开index.html文件。
 3. 输入硅基流动的api密钥，点击保存。此时api密钥保存在cookie中，下次打开页面不需要再输入。
 4. 在页面空白处Ctrl+V粘贴公式图片，自动识别公式。
