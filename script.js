@@ -18,6 +18,16 @@ document.addEventListener('DOMContentLoaded', function() {
     loadApiKey();
 });
 
+// 模型配置
+modelConfig = {
+    "Qwen2.5-VL-32B": {
+        name: "Qwen/Qwen2.5-VL-32B-Instruct",
+    },
+    "Qwen2.5-VL-7B": {
+        name: "Pro/Qwen/Qwen2.5-VL-7B-Instruct",
+    },
+}
+
 // 保存API密钥
 function saveApiKey() {
     const apiKeyInput = document.getElementById('apiKeyInput');
@@ -81,10 +91,8 @@ function handlePaste(e) {
         if (blob) {
             processImage(blob);
         }
-    } else {
-        // 如果不是图片，允许正常粘贴
-        return;
     }
+    // 如果不是图片，允许正常粘贴
 }
 
 // 处理文件选择
@@ -129,8 +137,11 @@ async function callCustomAPI(base64Data) {
             return;
         }
 
+        // 获取模型选择器
+        const modelSelect = document.getElementById('modelSelect');
+        const modelName = modelConfig[modelSelect.value].name;
         const url = "https://api.siliconflow.cn/v1/chat/completions";
-        const prompts = "请把图中的公式转成latex格式，不要输出其他内容，前后的$$也不要输出";
+        const prompts = "请把图中的公式转成latex格式，不要输出其他内容，包括latex代码前后的$$符号";
 
         const response = await fetch(url, {
             method: 'POST',
@@ -139,7 +150,7 @@ async function callCustomAPI(base64Data) {
                 'Authorization': `Bearer ${apiKey}`
             },
             body: JSON.stringify({
-                model: "Qwen/Qwen2.5-VL-32B-Instruct",
+                model: modelName,
                 messages: [
                     {
                         role: "user",
@@ -177,7 +188,13 @@ async function callCustomAPI(base64Data) {
         const data = await response.json();
 
         if (data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
-            const latexCode = data.choices[0].message.content;
+            // 获取LaTeX代码
+            let latexCode = data.choices[0].message.content;
+
+            // 使用正则表达式匹配并删除首尾的$$符号及其附近的换行符
+            latexCode = latexCode.replace(/^\s*\$\$[\r\n]*|[\r\n]*\$\$\s*$/g, '');
+
+            // 更新输入框和渲染
             document.getElementById('latexInput').value = latexCode;
             renderLaTeX();
         } else {

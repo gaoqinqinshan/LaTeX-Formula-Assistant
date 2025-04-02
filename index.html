@@ -40,6 +40,15 @@
                                 <input type="text" id="apiKeyInput" class="form-control" placeholder="请输入API密钥">
                                 <button id="saveApiKeyButton" class="btn btn-primary">保存</button>
                             </div>
+                            <!-- 添加模型选择下拉框 -->
+                            <div class="mt-3">
+                                <label for="modelSelect" class="form-label">选择模型</label>
+                                <select id="modelSelect" class="form-select">
+                                    <option value="Qwen2.5-VL-7B">Qwen2.5-VL-7B</option>
+                                    <option value="Qwen2.5-VL-32B">Qwen2.5-VL-32B</option>
+                                    <option value="other" disabled>待添加</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -87,7 +96,6 @@
                             <li><strong>查看LaTeX公式</strong>：上传图片后，系统会自动识别图片中的公式并生成LaTeX代码，您可以在右侧查看和编辑。</li>
                             <li><strong>公式预览</strong>：在LaTeX代码输入框下方，会实时显示公式的预览效果。</li>
                         </ul>
-                        <p class="card-text">如果您遇到任何问题，请联系我们的支持团队。</p>
                     </div>
                 </div>
             </div>
