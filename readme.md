@@ -1,23 +1,45 @@
-# LaTex公式识别助手
+# LaTeX公式识别助手
 
-## 介绍
+## 简介
+LaTeX公式识别助手是一个基于多模态大模型的工具，能够高效识别LaTeX公式并使用Temml进行公式渲染。通过简单的API密钥设置和图片上传，用户可以快速获取LaTeX代码并转换为MathML格式，方便在Word等文档中使用。
 
-LaTex公式识别助手是一个基于多模态大模型的模型，可以识别LaTeX公式，并使用Temml来渲染公式。
+## 核心功能
+- **公式识别**：支持通过图片上传或粘贴识别LaTeX公式。
+- **实时预览**：在输入框中实时渲染公式效果。
+- **多模型支持**：支持Qwen2.5-VL-32B-Instruct和Qwen2.5-VL-7B-Instruct等模型。
+- **MathML转换**：一键将LaTeX公式转换为MathML格式，方便在Word中使用。
+- **API密钥管理**：支持本地保存API密钥，方便下次使用。
 
-## 使用
+## 使用方法
+### 安装
+1. 下载项目的release包，解压到本地。
+2. 或者直接访问 [GitHub Page](https://latex.luxiaoxiao.work/) 使用在线版本。
 
-1. 下载release包，解压到本地。或者直接访问[GitHub Page](https://latex.luxiaoxiao.work/)
-2. 打开index.html文件。
-3. 输入硅基流动的api密钥，点击保存。此时api密钥保存在cookie中，下次打开页面不需要再输入。
-4. 在页面空白处Ctrl+V粘贴公式图片，自动识别公式。
-5. 等待片刻后，公式会自动渲染。
-6. 可以点击复制MathML按钮，复制MathML代码，粘贴到Word中。
+### 配置
+1. 在页面左侧输入您的硅基流动API密钥，并点击“保存”。
+2. API密钥将保存在本地存储中，下次打开页面无需重新输入。
 
-## 依赖
+### 使用
+1. 在页面空白处按 `Ctrl+V` 粘贴公式图片，或者拖拽图片到上传区域。
+2. 等待片刻，系统会自动识别公式并生成LaTeX代码。
+3. 在右侧查看和编辑LaTeX代码，预览公式效果。
+4. 点击“复制MathML”按钮，将公式转换为MathML格式并复制到剪贴板。
 
-[BootStrap](https://getbootstrap.com/)
+## 依赖项
+- **Bootstrap**：用于页面布局和样式。
+    - [Bootstrap](https://getbootstrap.com/)
+- **Temml**：用于LaTeX到MathML的转换。
+    - [Temml](https://temml.org/)
+- **多模态大模型**：
+    - Qwen2.5-VL-32B-Instruct
+    - Qwen2.5-VL-7B-Instruct
 
-[Temml](https://temml.org/)
 
-Qwen2.5-VL-32B-Instruct、Qwen2.5-VL-7B-Instruct
+## 常见问题
+- **Q: 如何解决API密钥无效的问题？**
+    - A: 确保您输入的API密钥正确，并检查网络连接。
+- **Q: 如何切换不同的模型？**
+    - A: 在页面左侧的“选择模型”下拉框中选择所需的模型。
+- **Q: 为什么公式渲染失败？**
+    - A: 检查LaTeX代码是否正确，或者尝试更换图片。
 
