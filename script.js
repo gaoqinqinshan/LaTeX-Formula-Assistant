@@ -147,7 +147,7 @@ async function callCustomAPI(base64Data) {
         const modelSelect = document.getElementById('modelSelect');
         const modelName = modelConfig[modelSelect.value].name;
         const url = "https://api.siliconflow.cn/v1/chat/completions";
-        const prompts = "请把图中的公式转成latex格式，不要输出其他内容，包括latex代码前后的$$符号";
+        const prompts = "请把图中的公式转成LaTeX格式，不要输出任何额外内容。";
 
         const response = await fetch(url, {
             method: 'POST',
@@ -199,6 +199,9 @@ async function callCustomAPI(base64Data) {
 
             // 使用正则表达式匹配并删除首尾的$$符号及其附近的换行符
             latexCode = latexCode.replace(/^\s*\$\$[\r\n]*|[\r\n]*\$\$\s*$/g, '');
+
+            // 使用正则表达式匹配并删除首尾的```latex```代码块标记
+            latexCode = latexCode.replace(/^\s*```latex[\r\n]*|[\r\n]*```latex\s*$/g, '');
 
             // 更新输入框和渲染
             document.getElementById('latexInput').value = latexCode;
