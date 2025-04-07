@@ -206,6 +206,11 @@ async function callCustomAPI(base64Data) {
             // 更新输入框和渲染
             document.getElementById('latexInput').value = latexCode;
             renderLaTeX();
+
+            if (data.usage && data.usage.total_tokens) {
+                document.getElementById('tokenCountDisplay').textContent = data.usage.total_tokens;
+            }
+
         } else {
             alert('无法提取LaTeX代码，请尝试其他图片。');
         }
