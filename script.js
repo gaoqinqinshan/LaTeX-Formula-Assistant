@@ -1,3 +1,6 @@
+// 全局变量，用于跟踪是否正在加载
+let isLoading = false;
+
 document.addEventListener('DOMContentLoaded', function() {
     // 监听粘贴事件
     document.addEventListener('paste', handlePaste);
@@ -41,9 +44,9 @@ function saveApiKey() {
 
     if (apiKey) {
         localStorage.setItem('apiKey', apiKey);
-        alert('API密钥已保存！');
+        showAlert('API密钥已保存！');
     } else {
-        alert('请输入有效的API密钥');
+        showAlert('请输入有效的API密钥');
     }
 }
 
@@ -59,6 +62,11 @@ function loadApiKey() {
 
 // 处理粘贴事件
 function handlePaste(e) {
+    if (isLoading) {
+        e.preventDefault(); // 阻止粘贴
+        return;
+    }
+
     // 检查当前焦点是否在输入框上
     const focusedElement = document.activeElement;
     const apiKeyInput = document.getElementById('apiKeyInput');
@@ -95,6 +103,8 @@ function handlePaste(e) {
         }
 
         if (blob) {
+            // 显示加载动画
+            showLoading();
             processImage(blob);
         }
     }
@@ -103,8 +113,14 @@ function handlePaste(e) {
 
 // 处理文件选择
 function handleFileSelect(e) {
+    if (isLoading) {
+        return; // 如果正在加载，直接返回
+    }
+
     const file = e.target.files[0];
     if (file && file.type.startsWith('image/')) {
+        // 显示加载动画
+        showLoading();
         processImage(file);
     }
 }
@@ -132,14 +148,16 @@ async function callCustomAPI(base64Data) {
     try {
         // 检查网络连接
         if (!navigator.onLine) {
-            alert('当前无网络连接，请检查您的网络设置。');
+            hideLoading(); // 隐藏加载动画
+            showAlert('当前无网络连接，请检查您的网络设置。');
             return;
         }
 
         // 获取API密钥
         const apiKey = document.getElementById('apiKeyInput').value.trim();
         if (!apiKey) {
-            alert('请输入有效的API密钥');
+            hideLoading(); // 隐藏加载动画
+            showAlert('请输入有效的API密钥');
             return;
         }
 
@@ -188,12 +206,15 @@ async function callCustomAPI(base64Data) {
         });
 
         if (!response.ok) {
+            hideLoading(); // 隐藏加载动画
             throw new Error(`API调用失败，状态码: ${response.status}`);
         }
 
         const data = await response.json();
 
         if (data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+            hideLoading(); // 隐藏加载动画
+
             // 获取LaTeX代码
             let latexCode = data.choices[0].message.content;
 
@@ -212,14 +233,16 @@ async function callCustomAPI(base64Data) {
             }
 
         } else {
-            alert('无法提取LaTeX代码，请尝试其他图片。');
+            hideLoading(); // 隐藏加载动画
+            showAlert('无法提取LaTeX代码，请尝试其他图片。');
         }
     } catch (error) {
         console.error('Error:', error);
+        hideLoading(); // 隐藏加载动画
         if (error.message.includes('Failed to fetch')) {
-            alert('API链接解析失败，请检查链接的合法性和网络连接。');
+            showAlert('API链接解析失败，请检查链接的合法性和网络连接。');
         } else {
-            alert('API调用失败，请检查网络连接或API密钥。');
+            showAlert('API调用失败，请检查网络连接或API密钥。');
         }
     }
 }
@@ -252,13 +275,14 @@ function copyLaTeX() {
     const latexInput = document.getElementById('latexInput').value;
     if (latexInput) {
         navigator.clipboard.writeText(latexInput).then(() => {
-            alert('LaTeX已复制到剪贴板');
+            // 显示toast
+            showToast('LaTeX已复制到剪贴板');
         }).catch(err => {
             console.error('复制失败:', err);
-            alert('复制失败，请检查您的浏览器设置');
+            showAlert('复制失败，请检查您的浏览器设置');
         });
     } else {
-        alert('没有LaTeX内容可复制');
+        showAlert('没有LaTeX内容可复制');
     }
 }
 
@@ -274,20 +298,62 @@ function copyMathML() {
                 xml: true,
                 MathFont: 'Latin-Modern',
                 OutputType: 'Flat MML',
-
             });
 
             navigator.clipboard.writeText(mathML).then(() => {
-                alert('MathML已复制到剪贴板');
+                // 显示toast
+                showToast('MathML已复制到剪贴板');
             }).catch(err => {
                 console.error('复制失败:', err);
-                alert('复制失败，请检查您的浏览器设置');
+                showAlert('复制失败，请检查您的浏览器设置');
             });
         } catch (error) {
             console.error('转换失败:', error);
-            alert('无法转换为MathML，请检查LaTeX代码');
+            showAlert('无法转换为MathML，请检查LaTeX代码');
         }
     } else {
-        alert('没有LaTeX内容可转换');
+        showAlert('没有LaTeX内容可转换');
     }
+}
+
+function showAlert(message) {
+    const alertContainer = document.getElementById('alertContainer');
+    const alertMessage = document.getElementById('alertMessage');
+
+    alertMessage.textContent = message;
+    alertContainer.style.display = 'block';
+
+    // 自动关闭 alert（3 秒后）
+    setTimeout(() => {
+        alertContainer.style.display = 'none';
+    }, 3000);
+}
+
+// 显示toast
+function showToast(message) {
+    const toastBody = document.getElementById('toastBody');
+    const toast = new bootstrap.Toast(document.getElementById('copyToast'));
+
+    // 设置toast内容
+    toastBody.textContent = message;
+
+    // 显示toast
+    toast.show();
+
+    // 设置自动关闭时间（1秒后关闭）
+    setTimeout(() => {
+        toast.hide();
+    }, 1000);
+}
+
+// 显示加载动画
+function showLoading() {
+    isLoading = true;
+    document.getElementById('loadingOverlay').style.display = 'flex';
+}
+
+// 隐藏加载动画
+function hideLoading() {
+    isLoading = false;
+    document.getElementById('loadingOverlay').style.display = 'none';
 }
